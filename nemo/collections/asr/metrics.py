@@ -90,15 +90,14 @@ def classification_accuracy(
         top_k = [1]
     max_k = max(top_k)
 
-    probabilities = torch.softmax(logits, dim=-1)
+    with torch.no_grad():
+        _, predictions = logits.topk(max_k, dim=1, largest=True, sorted=True)
+        predictions = predictions.t()
+        correct = predictions.eq(targets.view(1, -1)).expand_as(predictions)
 
-    _, predictions = probabilities.topk(max_k, dim=1, largest=True, sorted=True)
-    predictions = predictions.t()
-    correct = predictions.eq(targets.view(1, -1)).expand_as(predictions)
-
-    results = []
-    for k in top_k:
-        correct_k = correct[:k].view(-1).float().mean().to('cpu').numpy()
-        results.append(correct_k)
+        results = []
+        for k in top_k:
+            correct_k = correct[:k].view(-1).float().mean().to('cpu').numpy()
+            results.append(correct_k)
 
     return results
