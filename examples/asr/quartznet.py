@@ -190,8 +190,11 @@ def create_all_dags(args, neural_factory):
     callbacks = [train_callback]
 
     if args.checkpoint_dir or args.load_dir:
+        nemo.logging.info(f"Checkpoint directory : {neural_factory.checkpoint_dir}")
+        nemo.logging.info(f"Checkpoint save freq : {args.checkpoint_save_freq}")
+
         chpt_callback = nemo.core.CheckpointCallback(
-            folder=args.checkpoint_dir, load_from_folder=args.load_dir, step_freq=args.checkpoint_save_freq,
+            folder=neural_factory.checkpoint_dir, load_from_folder=args.load_dir, step_freq=args.checkpoint_save_freq,
         )
 
         callbacks.append(chpt_callback)
